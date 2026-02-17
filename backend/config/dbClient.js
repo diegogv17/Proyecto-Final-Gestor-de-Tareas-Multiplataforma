@@ -3,7 +3,7 @@ import { MongoClient } from "mongodb";
 
 class dbclient{
     constructor(){
-        const queryString = `mongodb+srv://${process.env.USER_DB}:${process.env.PASS_DB}@${process.env.SERVER_DB}/?appName=TCUFORUSPG`;
+        const queryString = `mongodb+srv://dagomezv_db_user:Proyecto_final2026@tcuforuspg.hgvtvpl.mongodb.net/Usuario?retryWrites=true&w=majority&appName=TCUFORUSPG`;
         this.client = new MongoClient(queryString)
         this.conectarBD();
     }
@@ -20,4 +20,4 @@ class dbclient{
     }
 }
 
-export default new dbclient;
+export default new dbclient();

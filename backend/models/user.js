@@ -13,7 +13,7 @@ class userModel {
     }
     //modelo para actualizar datos (PUT)
     async update(_id,data){
-         return await user.findOneAndUpdate({ _id: new mongoose.Types.ObjectId(id) },   // ← ESTO ES LO IMPORTANTE
+         return await user.findOneAndUpdate({ _id: new mongoose.Types.ObjectId(_id) },   // ← ESTO ES LO IMPORTANTE
         {
             ...data,
             updatedAt: new Date()

@@ -18,7 +18,7 @@ export function verificarToken(req, res, next) {
         req.emailConectado = dataToken.email;
         next();
     } catch (e) {
-        res.status(401).json({ error: 'Token no válido' });
+        return res.status(401).json({ error: 'Token no válido' });
     }
 
 }

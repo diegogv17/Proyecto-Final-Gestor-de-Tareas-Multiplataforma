@@ -21,7 +21,7 @@ class userControllers {
             const { email, name, password } = req.body;
 
             // Verificamos si el usuario ya existe en la base de datos
-            const usuarioExiste = await userModel.findOne({ email });
+            const usuarioExiste = await userModel.getOne({ email });
 
             if (usuarioExiste) {
                 return res.status(400).json({
@@ -41,10 +41,13 @@ class userControllers {
 
             });
 
+            // Generamos el token JWT
+            const token = generarToken(data.email);
+
             // Respondemos con status 201 (creado)
             res.status(201).json({
-                msg: "Usuario registrado correctamente",
-                user: data
+                user: data,
+                token: token
             });
 
         }
@@ -66,7 +69,7 @@ class userControllers {
             const { email, password } = req.body;
 
             // Buscamos el usuario en la base de datos
-            const usuarioExiste = await userModel.findOne({ email });
+            const usuarioExiste = await userModel.getOne({ email });
 
             // Si no existe el usuario
             if (!usuarioExiste) {
@@ -95,10 +98,8 @@ class userControllers {
 
             // Respondemos con el token
             res.status(200).json({
-
-                msg: "Login exitoso",
-                token: token,
-                user: usuarioExiste
+                user: usuarioExiste,
+                token: token
             });
 
         }
@@ -113,18 +114,18 @@ class userControllers {
         }
     }
 
-    // PERFIL DE USUARIO
-    async profile(req, res) {
+    // PERFIL DE USUARIO (GET /api/auth/me)
+    async me(req, res) {
 
         try {
             // El email viene desde el middleware de autenticación
             const email = req.emailConectado;
 
             // Buscamos el usuario
-            const usuario = await userModel.findOne({ email });
+            const usuario = await userModel.getOne({ email });
 
             // Respondemos con los datos
-            res.status(200).json(usuario);
+            res.status(200).json({ user: usuario });
         }
         catch (error) {
 
@@ -141,7 +142,7 @@ class userControllers {
     // OBTENER TODOS LOS USUARIOS
     async getAll(req, res) {
         try {
-            const usuarios = await userModel.find();
+            const usuarios = await userModel.getAll();
             res.status(200).json(usuarios);
         }
         catch (error) {
@@ -154,12 +155,12 @@ class userControllers {
 
 
     // OBTENER UN USUARIO POR ID
-    async getOne(req, res) {
+    async getOneById(req, res) {
         try {
 
             const { id } = req.params;
 
-            const usuario = await userModel.findById(id);
+            const usuario = await userModel.getOneById(id);
 
             res.status(200).json(usuario);
         }
@@ -178,12 +179,7 @@ class userControllers {
 
         try {
             const { id } = req.params;
-            const usuario = await userModel.findByIdAndUpdate(
-
-                id,
-                req.body,
-                { new: true }
-            );
+            const usuario = await userModel.update(id, req.body);
             res.status(200).json(usuario);
         }
         catch (error) {
@@ -197,7 +193,7 @@ class userControllers {
     async delete(req, res) {
         try {
             const { id } = req.params;
-            await userModel.findByIdAndDelete(id);
+            await userModel.delete(id);
 
             res.status(200).json({
                 msg: "Usuario eliminado"

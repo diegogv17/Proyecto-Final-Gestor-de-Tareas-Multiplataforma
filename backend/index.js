@@ -26,9 +26,9 @@ app.use(bodyParser.urlencoded({extended : true}))
 
 
 // RUTAS
-// Todas las rutas definidas en userRoutes.js tendrán el prefijo /user
-// Ejemplo: POST /user, GET /user/:id, etc.
-app.use('/user', route)
+// Todas las rutas definidas en userRoutes.js tendrán el prefijo /api/auth
+// Ejemplo: POST /api/auth/register, GET /api/auth/me, etc.
+app.use('/api/auth', route)
 
 
 // INICIAR SERVIDOR

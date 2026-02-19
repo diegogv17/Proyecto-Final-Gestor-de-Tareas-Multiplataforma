@@ -37,4 +37,4 @@ const userSchema = new mongoose.Schema({
     versionKey: false // elimina __v)
 })
 
-export default mongoose.model('usercollections', userSchema);
+export default mongoose.model('users', userSchema);

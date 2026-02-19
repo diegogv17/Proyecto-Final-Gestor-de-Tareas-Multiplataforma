@@ -1,38 +1,17 @@
-// Importamos express para poder crear las rutas
-import express from 'express'
-// Creamos un Router de express para manejar las rutas de usuario
+import express from 'express';
 const route = express.Router();
-// Importamos el controlador de usuario
-import user from '../controllers/user.js'
+import usuariosController from '../controllers/user.js';
+import { verificarToken } from '../helpers/autetication.js';
 
+// Autenticación
+route.post('/register', usuariosController.register);
+route.post('/login', usuariosController.login);
+route.get('/me', verificarToken, usuariosController.me);
 
-// POST /user
-// Crear un nuevo usuario
-route.post('/register', user.register)
+// CRUD de usuarios
+route.get('/', usuariosController.getAll);
+route.get('/:id', usuariosController.getOneById);
+route.put('/:id', usuariosController.update);
+route.delete('/:id', usuariosController.delete);
 
-
-// GET /user/:id
-// Obtener un usuario específico por su ID
-// Ejemplo: /user/6996b54850c22a128bf6e699
-route.get('/:id', user.getOne)
-
-
-// GET /user
-// Obtener todos los usuarios
-route.get('/', user.getAll)
-
-
-
-// PUT /user/:id
-// Actualizar un usuario por su ID
-route.put('/:id',user.update)
-
-
-
-// DELETE /user/:id
-// Eliminar un usuario por su ID
-route.delete('/:id',user.delete)
-
-
-//Se exporta
 export default route;

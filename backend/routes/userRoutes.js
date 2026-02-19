@@ -8,7 +8,7 @@ import user from '../controllers/user.js'
 
 // POST /user
 // Crear un nuevo usuario
-route.post('/', user.create)
+route.post('/register', user.register)
 
 
 // GET /user/:id

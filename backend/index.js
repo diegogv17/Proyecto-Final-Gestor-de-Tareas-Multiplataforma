@@ -1,6 +1,6 @@
 import 'dotenv/config'
 import express from 'express'
-import route from './routes/userRoutes.js';
+//import route from './routes/userRoutes.js';
 //import dbClient from './config/dbClient.js';
 
 const app = express();

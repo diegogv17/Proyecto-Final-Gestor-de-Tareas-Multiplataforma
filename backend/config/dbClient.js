@@ -1,9 +1,13 @@
 import 'dotenv/config'
 import { MongoClient } from "mongodb";
+import dns from "node:dns/promises";
+
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
+
 
 class dbclient{
     constructor(){
-        const queryString = `mongodb+srv://dagomezv_db_user:Proyecto_final2026@tcuforuspg.hgvtvpl.mongodb.net/Usuario?retryWrites=true&w=majority&appName=TCUFORUSPG`;
+        const queryString = process.env.MONGODB_URI;
         this.client = new MongoClient(queryString)
         this.conectarBD();
     }

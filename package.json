@@ -1,5 +1,6 @@
 {
   "dependencies": {
+<<<<<<< HEAD
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
@@ -13,19 +14,40 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+=======
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "mongodb": "^7.1.0"
+  },
+  "name": "proyecto_final_piii",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "devDependencies": {},
+>>>>>>> f443d6d94af180c9fe0a45aa4b6a10a0781ea897
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
+<<<<<<< HEAD
     "url": "git+https://bitbucket.org/diegx_g17/{31060fca-38af-4f94-b80d-de084757d491}.git"
+=======
+    "url": "git+https://diegx_g17-admin@bitbucket.org/diegx_g17/proyecto_final_piii.git"
+>>>>>>> f443d6d94af180c9fe0a45aa4b6a10a0781ea897
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "bugs": {
+<<<<<<< HEAD
     "url": "https://bitbucket.org/diegx_g17/{31060fca-38af-4f94-b80d-de084757d491}/issues"
   },
   "homepage": "https://bitbucket.org/diegx_g17/{31060fca-38af-4f94-b80d-de084757d491}#readme"
+=======
+    "url": "https://bitbucket.org/diegx_g17/proyecto_final_piii/issues"
+  },
+  "homepage": "https://bitbucket.org/diegx_g17/proyecto_final_piii#readme"
+>>>>>>> f443d6d94af180c9fe0a45aa4b6a10a0781ea897
 }

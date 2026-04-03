@@ -4,12 +4,12 @@ import 'dotenv/config'
 // Importa mongoose, que es la librería para conectarse a MongoDB
 import mongoose from 'mongoose';
 
-// Importa el módulo DNS para configurar servidores DNS manualmente
+// Importa el módulo DNS para configurar servidores DNS manualmente https://www.mongodb.com/community/forums/t/error-querysrv-econnrefused-mongodb/259042
 import dns from "node:dns/promises";
 
 
 // Establece servidores DNS públicos para evitar errores como:
-// querySrv ECONNREFUSED o ENOTFOUND en MongoDB Atlas
+// querySrv ECONNREFUSED o ENOTFOUND en MongoDB Atlas https://www.mongodb.com/community/forums/t/error-querysrv-econnrefused-mongodb/259042
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 // Clase que maneja la conexión a la base de datos

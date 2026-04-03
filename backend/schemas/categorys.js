@@ -38,7 +38,7 @@ const categorySchema = new mongoose.Schema({
 
 }, {
     timestamps: true,
-    versionKey: false // elimina __v)
+    versionKey: false // elimina __v
 });
 
 export default mongoose.model("Category", categorySchema);

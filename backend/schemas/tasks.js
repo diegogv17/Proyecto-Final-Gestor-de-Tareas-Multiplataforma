@@ -63,4 +63,5 @@ const taskSchema = new mongoose.Schema({
     versionKey: false // elimina __v
 });
 
-export default mongoose.model("Task", taskSchema);
+//export default mongoose.model("Task", taskSchema);
+export default taskSchema;

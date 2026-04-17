@@ -65,11 +65,13 @@ class userControllers {
     async login(req, res) {
 
         try {
+            console.log('Login attempt:', req.body);
             // Obtenemos los datos enviados
             const { email, password } = req.body;
 
             // Buscamos el usuario en la base de datos
             const usuarioExiste = await userModel.getOne({ email });
+            console.log('User found:', !!usuarioExiste);
 
             // Si no existe el usuario
             if (!usuarioExiste) {
@@ -84,6 +86,7 @@ class userControllers {
                 password,
                 usuarioExiste.password
             );
+            console.log('Password valid:', passwordValido);
 
             // Si la contraseña es incorrecta
             if (!passwordValido) {
@@ -95,6 +98,7 @@ class userControllers {
 
             // Generamos el token JWT
             const token = generarToken(usuarioExiste.email);
+            console.log('Token generated:', !!token);
 
             // Respondemos con el token
             res.status(200).json({

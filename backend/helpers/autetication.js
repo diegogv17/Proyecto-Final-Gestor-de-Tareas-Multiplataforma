@@ -5,6 +5,12 @@ import 'dotenv/config';
 // Importa la librería jsonwebtoken para generar y verificar tokens JWT
 import jsonwebtoken from 'jsonwebtoken';
 
+// Importa el modelo de usuario
+import userModel from '../models/user.js';
+
+// Importa el modelo de usuario
+import userModel from '../models/user.js';
+
 // Función que genera un token JWT
 // Recibe como parámetro el email del usuario autenticado
 export function generarToken(email) {
@@ -17,14 +23,19 @@ export function generarToken(email) {
 
 // Middleware para verificar si el token enviado por el cliente es válido
 // Se usa para proteger rutas privadas
-export function verificarToken(req, res, next) {
+export async function verificarToken(req, res, next) {
+
+    console.log('Verificando token...');
 
     // Obtiene el header Authorization
     // El formato esperado es: "Bearer TOKEN_AQUI"
     // Se usa replace para eliminar la palabra "Bearer " y quedarse solo con el token
     const token = req.header('Authorization')?.replace('Bearer ', '');
+    console.log('Token recibido:', !!token);
+
     // Si no existe token, se bloquea el acceso
     if (!token) {
+        console.log('No token provided');
         return res.status(401).json({ error: 'Token requerido' });
     }
 
@@ -32,14 +43,29 @@ export function verificarToken(req, res, next) {
         // Verifica que el token sea válido usando la misma clave secreta
         // Si el token fue alterado o expiró, lanzará un error
         const dataToken = jsonwebtoken.verify(token, process.env.JWT_TOKEN_SECRET);
+        console.log('Token verificado:', dataToken);
+
         // Extrae el email del payload del token
-        // y lo guarda en el objeto request
-        // Esto permite usar req.emailConectado en las rutas protegidas
-        req.emailConectado = dataToken.email;
+        const email = dataToken.email;
+
+        // Busca el usuario en la base de datos
+        const user = await userModel.getOne({ email });
+        console.log('Usuario encontrado:', !!user);
+
+        if (!user) {
+            return res.status(401).json({ error: 'Usuario no encontrado' });
+        }
+
+        // Guarda el usuario completo en req.user
+        req.user = user;
+        // También guarda el email por compatibilidad
+        req.emailConectado = email;
+
+        console.log('Middleware completado, continuando...');
         // Continúa hacia el siguiente middleware o controlador
         next();
     } catch (e) {
-
+        console.log('Error en token:', e.message);
         // Si ocurre un error (token inválido o expirado)
         // se devuelve error 401 Unauthorized
         return res.status(401).json({ error: 'Token no válido' });

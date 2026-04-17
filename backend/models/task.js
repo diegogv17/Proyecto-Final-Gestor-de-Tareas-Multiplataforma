@@ -17,8 +17,8 @@ class taskModel {
     }
 
     // OBTENER UNA TAREA POR ID
-    async getOneById(id) {
-        return await Task.findById(id);
+    async getOneById(id, userId) {
+        return await Task.findOne({ _id: id, userId: userId });
     }
 
     // CREAR TAREA
@@ -28,9 +28,9 @@ class taskModel {
     }
 
     // ACTUALIZAR TAREA
-    async update(id, data) {
-        return await Task.findByIdAndUpdate(
-            id,
+    async update(id, data, userId) {
+        return await Task.findOneAndUpdate(
+            { _id: id, userId: userId },
             data,
             {
                 returnDocument: 'after',
@@ -40,8 +40,8 @@ class taskModel {
     }
 
     // ELIMINAR TAREA
-    async delete(id) {
-        return await Task.findByIdAndDelete(id);
+    async delete(id, userId) {
+        return await Task.findOneAndDelete({ _id: id, userId: userId });
     }
 
 }

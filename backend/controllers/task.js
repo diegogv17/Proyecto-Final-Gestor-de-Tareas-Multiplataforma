@@ -17,9 +17,8 @@ class taskControllers {
             if (priority) filters.priority = priority;
             if (categoryId) filters.categoryId = categoryId;
 
-            
             if (req.user) {
-                filters.userId = req.user.id;
+                filters.userId = req.user._id;
             }
 
             const tasks = await taskModel.getAll(filters);
@@ -45,7 +44,7 @@ class taskControllers {
 
             const { id } = req.params;
 
-            const task = await taskModel.getOneById(id);
+            const task = await taskModel.getOneById(id, req.user._id);
 
             if (!task) {
                 return res.status(404).json({
@@ -75,8 +74,7 @@ class taskControllers {
                 status,
                 priority,
                 dueDate,
-                categoryId,
-                userId
+                categoryId
             } = req.body;
 
             if (!title || !categoryId) {
@@ -93,7 +91,7 @@ class taskControllers {
                 priority,
                 dueDate,
                 categoryId,
-                userId
+                userId: req.user._id
 
             });
 
@@ -118,7 +116,7 @@ class taskControllers {
 
             const { id } = req.params;
 
-            const task = await taskModel.update(id, req.body);
+            const task = await taskModel.update(id, req.body, req.user._id);
 
             if (!task) {
                 return res.status(404).json({
@@ -145,7 +143,7 @@ class taskControllers {
 
             const { id } = req.params;
 
-            const task = await taskModel.delete(id);
+            const task = await taskModel.delete(id, req.user._id);
 
             if (!task) {
                 return res.status(404).json({

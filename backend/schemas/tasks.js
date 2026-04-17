@@ -1,11 +1,6 @@
 import mongoose from "mongoose";
-import { v4 as uuidv4 } from 'uuid';
 
 const taskSchema = new mongoose.Schema({
-    _id: {
-        type: String,
-        default: uuidv4
-    },
     title: {
         type: String,
         required: true,
@@ -37,13 +32,13 @@ const taskSchema = new mongoose.Schema({
     },
 
     categoryId: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'Category'
     },
 
     userId: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'User'
     },

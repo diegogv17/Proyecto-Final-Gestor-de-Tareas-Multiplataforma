@@ -6,7 +6,7 @@ import 'dotenv/config';
 import jsonwebtoken from 'jsonwebtoken';
 
 // Importa el modelo de usuario
-import userModel from '../models/user.js';
+//import userModel from '../models/user.js';
 
 // Importa el modelo de usuario
 import userModel from '../models/user.js';
@@ -18,7 +18,7 @@ export function generarToken(email) {
     // Primer parámetro: payload (datos que guardamos dentro del token)
     // Segundo parámetro: clave secreta para firmar el token
     // Tercer parámetro: opciones, en este caso expira en 1 hora
-    return jsonwebtoken.sign({ email }, process.env.JWT_TOKEN_SECRET, { expiresIn: '1h' });
+    return jsonwebtoken.sign({ email }, process.env.JWT_TOKEN_SECRET, { expiresIn: '7d' });
 }
 
 // Middleware para verificar si el token enviado por el cliente es válido

@@ -1,79 +1,26 @@
-import express from "express";
+import express from 'express';
+import { verificarToken } from '../helpers/autetication.js';
+import categoryControllers from '../controllers/category.js';
+
 const router = express.Router();
 
-import categoryModel from "../models/category.js";
-import { verificarToken } from "../helpers/autetication.js";
+// GET /api/categories → { categories: [...] }
+router.get('/', verificarToken, (req, res) => categoryControllers.getAll(req, res));
 
-// CREAR CATEGORÍA
-router.post("/", verificarToken, async (req, res) => {
-    try {
-        const category = await categoryModel.create({
-            name: req.body.name,
-            color: req.body.color,
-            icon: req.body.icon,
-            userId: req.user._id
-        });
+// GET /api/categories/:id → { category, tasks: [...] }
+router.get('/:id', verificarToken, (req, res) =>
+  categoryControllers.getOneById(req, res),
+);
 
-        res.status(201).json(category);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+// POST /api/categories → { category }
+router.post('/', verificarToken, (req, res) => categoryControllers.create(req, res));
 
-// OBTENER CATEGORÍAS (PARA DROPDOWN)
-router.get("/", verificarToken, async (req, res) => {
-    try {
-        const categories = await categoryModel.getAll(req.user._id);
+// PUT /api/categories/:id → { category }
+router.put('/:id', verificarToken, (req, res) => categoryControllers.update(req, res));
 
-        res.json(categories);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// OBTENER CATEGORÍA POR ID
-router.get("/:id", verificarToken, async (req, res) => {
-    try {
-        const category = await categoryModel.getOneById(req.params.id);
-
-        if (!category || category.userId.toString() !== req.user._id.toString()) {
-            return res.status(404).json({ error: "Categoría no encontrada" });
-        }
-
-        res.json(category);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// ACTUALIZAR CATEGORÍA
-router.put("/:id", verificarToken, async (req, res) => {
-    try {
-        const category = await categoryModel.update(req.params.id, req.body);
-
-        if (!category) {
-            return res.status(404).json({ error: "Categoría no encontrada" });
-        }
-
-        res.json(category);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// ELIMINAR CATEGORÍA
-router.delete("/:id", verificarToken, async (req, res) => {
-    try {
-        const category = await categoryModel.delete(req.params.id);
-
-        if (!category) {
-            return res.status(404).json({ error: "Categoría no encontrada" });
-        }
-
-        res.json({ message: "Categoría eliminada" });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+// DELETE /api/categories/:id → { message } (solo si no tiene tareas)
+router.delete('/:id', verificarToken, (req, res) =>
+  categoryControllers.delete(req, res),
+);
 
 export default router;

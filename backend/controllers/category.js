@@ -86,8 +86,20 @@ class categoryControllers {
     async update(req, res) {
         try {
             const { id } = req.params;
+            const { name, color, icon } = req.body;
 
-            const category = await categoryModel.update(id, req.body, req.user._id);
+            const updates = {};
+            if (name !== undefined) updates.name = name;
+            if (color !== undefined) updates.color = color;
+            if (icon !== undefined) updates.icon = icon;
+
+            if (Object.keys(updates).length === 0) {
+                return res.status(400).json({
+                    error: 'No hay campos para actualizar',
+                });
+            }
+
+            const category = await categoryModel.update(id, updates, req.user._id);
 
             if (!category) {
                 return res.status(404).json({

@@ -1,0 +1,302 @@
+<!-- ══════════════════════════════════
+     TaskFlow — Categorías
+     ══════════════════════════════════ -->
+<div class="app-wrapper">
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="logo">
+      <svg class="logo-icon" viewBox="0 0 36 36" fill="none">
+        <rect width="36" height="36" rx="10" fill="#ffffff22"/>
+        <path d="M10 13h16M10 18h10M10 23h13" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="27" cy="23" r="4" fill="#a8bfc9" stroke="white" stroke-width="1.5"/>
+        <path d="M25.5 23l1 1 2-2" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      TaskFlow
+    </div>
+    <div class="navbar-right">
+      <span class="user-greeting">Hola, {{ userName }}</span>
+      <button class="btn-logout" (click)="logout()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Salir
+      </button>
+    </div>
+  </header>
+
+  <div class="body-wrapper">
+
+    <!-- SIDEBAR -->
+    <aside class="barra-lateral" [class.collapsed]="sidebarCollapsed">
+      <button class="icono-menu" (click)="toggleSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+
+      <div class="linea-separadora"></div>
+
+      <nav class="sidebar-nav">
+        <!-- Tareas -->
+        <button class="nav-item" (click)="goToDashboard()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+          <span class="nav-label">Tareas</span>
+        </button>
+
+        <!-- Categorías (activo) -->
+        <button class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span class="nav-label">Categorías</span>
+          <span class="nav-badge">{{ categories.length }}</span>
+        </button>
+      </nav>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+      <!-- Header -->
+      <div class="content-header">
+        <div>
+          <h1 class="section-title">Categorías</h1>
+          <p class="section-sub">{{ categories.length }} categoría{{ categories.length !== 1 ? 's' : '' }}</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-refresh" (click)="loadAll()" [disabled]="loading" title="Recargar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"
+                 [class.spinning]="loading">
+              <polyline points="23 4 23 10 17 10"/>
+              <path d="M20.49 15a9 9 0 1 1-.18-4.9"/>
+            </svg>
+          </button>
+          <button class="btn-new" (click)="openCreate()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Nueva Categoría
+          </button>
+        </div>
+      </div>
+
+      <!-- Error -->
+      <div class="alert-error" *ngIf="errorMsg">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        {{ errorMsg }}
+        <button class="alert-close" (click)="errorMsg=''">✕</button>
+      </div>
+
+      <!-- Skeleton -->
+      <div class="grid-skeleton" *ngIf="loading">
+        <div class="skeleton-card" *ngFor="let i of [1,2,3,4]"></div>
+      </div>
+
+      <!-- Empty state -->
+      <div class="empty-state" *ngIf="!loading && categories.length === 0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="44" height="44">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+        </svg>
+        <p>No tienes categorías todavía</p>
+        <button class="btn-new" (click)="openCreate()">Crear primera categoría</button>
+      </div>
+
+      <!-- Grid de categorías -->
+      <div class="categories-grid" *ngIf="!loading && categories.length > 0">
+        <div class="cat-card" *ngFor="let cat of categories" (click)="openDetail(cat)">
+
+          <!-- Color bar + icono -->
+          <div class="cat-header" [style.background]="cat.color">
+            <span class="cat-icon">{{ cat.icon || '📁' }}</span>
+            <div class="cat-actions">
+              <button class="cat-action-btn" (click)="openEdit(cat, $event)" title="Editar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </button>
+              <button class="cat-action-btn danger" (click)="confirmDelete(cat, $event)" title="Eliminar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/>
+                  <path d="M9 6V4h6v2"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Info -->
+          <div class="cat-body">
+            <div class="cat-name">{{ cat.name }}</div>
+            <div class="cat-meta">
+              <span class="color-dot" [style.background]="cat.color"></span>
+              <span class="color-hex">{{ cat.color }}</span>
+            </div>
+            <div class="cat-task-count">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                <path d="M9 11l3 3L22 4"/>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+              </svg>
+              {{ taskCount(cat._id) }} tarea{{ taskCount(cat._id) !== 1 ? 's' : '' }}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL CREAR / EDITAR
+     ══════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h2>{{ editingCat ? 'Editar Categoría' : 'Nueva Categoría' }}</h2>
+      <button class="modal-close" (click)="closeModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Nombre -->
+      <div class="input-group">
+        <label>Nombre *</label>
+        <input type="text" [(ngModel)]="formData.name" placeholder="Ej: Trabajo, Personal..." maxlength="50"/>
+      </div>
+
+      <!-- Icono -->
+      <div class="input-group">
+        <label>Icono (emoji o texto)</label>
+        <input type="text" [(ngModel)]="formData.icon" placeholder="Ej: 💼 o briefcase" maxlength="30"/>
+      </div>
+
+      <!-- Color picker -->
+      <div class="input-group">
+        <label>Color</label>
+        <div class="color-picker-row">
+          <input type="color" [(ngModel)]="formData.color" class="native-color-input"/>
+          <input type="text"  [(ngModel)]="formData.color" placeholder="#3B82F6" maxlength="7" class="hex-input"/>
+        </div>
+
+        <!-- Paleta rápida -->
+        <div class="color-palette">
+          <button
+            *ngFor="let hex of colorPalette"
+            class="palette-dot"
+            [class.selected]="formData.color === hex"
+            [style.background]="hex"
+            (click)="pickColor(hex)"
+            [title]="hex">
+          </button>
+        </div>
+
+        <!-- Preview -->
+        <div class="color-preview" [style.background]="formData.color">
+          <span>{{ formData.name || 'Vista previa' }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
+      <button class="btn-save" (click)="save()" [disabled]="saving || !formData.name.trim()">
+        <span class="spinner" *ngIf="saving"></span>
+        <span *ngIf="!saving">{{ editingCat ? 'Actualizar' : 'Crear' }}</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL DETALLE CATEGORÍA
+     ══════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="showDetail" (click)="closeDetail()">
+  <div class="modal-card modal-lg" (click)="$event.stopPropagation()">
+
+    <div class="modal-header" [style.background]="detailCat?.color" style="color:white; border-bottom:none;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:1.4rem">{{ detailCat?.icon || '📁' }}</span>
+        <h2 style="margin:0; color:white;">{{ detailCat?.name }}</h2>
+      </div>
+      <button class="modal-close" (click)="closeDetail()" style="color:white;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Loading -->
+      <div class="detail-loading" *ngIf="detailLoading">
+        <span class="spinner spinner-dark"></span> Cargando tareas...
+      </div>
+
+      <!-- Sin tareas -->
+      <div class="empty-state-sm" *ngIf="!detailLoading && detailTasks.length === 0">
+        <p>No hay tareas en esta categoría</p>
+      </div>
+
+      <!-- Lista de tareas de la categoría -->
+      <div class="detail-tasks" *ngIf="!detailLoading && detailTasks.length > 0">
+        <p class="detail-subtitle">{{ detailTasks.length }} tarea{{ detailTasks.length !== 1 ? 's' : '' }} en esta categoría</p>
+        <div class="detail-task-item" *ngFor="let t of detailTasks">
+          <span class="status-dot" [class]="'dot-' + t.status"></span>
+          <div class="detail-task-info">
+            <span class="detail-task-title" [class.striked]="t.status === 'COMPLETED'">{{ t.title }}</span>
+            <span class="detail-task-meta">{{ labelStatus(t.status) }} · {{ t.priority }}</span>
+          </div>
+          <span class="priority-badge" [class]="'priority-' + t.priority">{{ t.priority }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-save" (click)="closeDetail()">Cerrar</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL CONFIRMAR BORRADO
+     ══════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="showDeleteConfirm" (click)="cancelDelete()">
+  <div class="modal-card modal-sm" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Eliminar categoría</h2>
+    </div>
+    <div class="modal-body">
+      <p class="delete-msg">
+        ¿Eliminar <strong>{{ catToDelete?.name }}</strong>?
+        Las tareas asociadas quedarán sin categoría.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="cancelDelete()">Cancelar</button>
+      <button class="btn-delete" (click)="deleteCategory()" [disabled]="deleteLoading">
+        <span class="spinner" *ngIf="deleteLoading"></span>
+        <span *ngIf="!deleteLoading">Sí, eliminar</span>
+      </button>
+    </div>
+  </div>
+</div>

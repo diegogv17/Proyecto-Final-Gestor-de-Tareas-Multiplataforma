@@ -1,3 +1,10 @@
+// ============================================================
+// AuthService: Servicio de autenticación (Login, Register, Perfil)
+// ============================================================
+// Esta capa se comunica con el backend para operaciones de auth.
+// Cada método llama a la API y transforma la respuesta JSON en
+// objetos de Dart (UserModel y token).
+// ============================================================
 import 'package:flutter_application_1/models/user_model.dart';
 import 'package:flutter_application_1/services/api_service.dart';
 import 'package:flutter_application_1/core/constants/api_constants.dart';
@@ -5,8 +12,9 @@ import 'package:flutter_application_1/core/constants/api_constants.dart';
 class AuthService {
   AuthService(this._api);
 
-  final ApiService _api;
+  final ApiService _api; // Cliente HTTP inyectado
 
+  // Iniciar sesión: POST /api/auth/login
   Future<({String token, UserModel user})> login({
     required String email,
     required String password,
@@ -24,6 +32,7 @@ class AuthService {
     );
   }
 
+  // Registrar usuario: POST /api/auth/register
   Future<({String token, UserModel user})> register({
     required String email,
     required String password,
@@ -42,6 +51,7 @@ class AuthService {
     );
   }
 
+  // Obtener perfil del usuario autenticado: GET /api/auth/me
   Future<UserModel> getCurrentUser() async {
     return _api.get(
       '${ApiConstants.authPath}/me',

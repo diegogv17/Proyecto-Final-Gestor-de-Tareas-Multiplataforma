@@ -1,51 +1,59 @@
-// Importa las variables de entorno desde el archivo .env
-// Permite usar process.env.JWT_TOKEN_SECRET
+// ============================================================
+// Helpers de Autenticación (JWT)
+// ============================================================
+// generarToken:    Crea un token JWT firmado con la clave secreta
+// verificarToken:  Middleware que protege rutas privadas
+//
+// JWT (JSON Web Token) es un estándar para tokens de acceso.
+// Permite que el servidor verifique la identidad del usuario
+// sin necesidad de mantener sesión en el servidor.
+// ============================================================
 import 'dotenv/config';
-
-// Importa la librería jsonwebtoken para generar y verificar tokens JWT
 import jsonwebtoken from 'jsonwebtoken';
-
-// Importa el modelo de usuario
-//import userModel from '../models/user.js';
-
-// Importa el modelo de usuario
 import userModel from '../models/user.js';
 
-// Función que genera un token JWT
-// Recibe como parámetro el email del usuario autenticado
+// ================================================================
+// GENERAR TOKEN JWT
+// Recibe: email del usuario
+// Devuelve: token firmado con expiración de 7 días
+// ================================================================
 export function generarToken(email) {
-        // sign() crea un token firmado digitalmente
-    // Primer parámetro: payload (datos que guardamos dentro del token)
-    // Segundo parámetro: clave secreta para firmar el token
-    // Tercer parámetro: opciones, en este caso expira en 1 hora
-    return jsonwebtoken.sign({ email }, process.env.JWT_TOKEN_SECRET, { expiresIn: '7d' });
+    // Sign crea un token con:
+    // - Payload: { email }  (datos dentro del token)
+    // - Clave secreta: process.env.JWT_TOKEN_SECRET (desde .env)
+    // - Opciones: expira en 7 días
+    return jsonwebtoken.sign(
+        { email },
+        process.env.JWT_TOKEN_SECRET,
+        { expiresIn: '7d' }
+    );
 }
 
-// Middleware para verificar si el token enviado por el cliente es válido
-// Se usa para proteger rutas privadas
+// ================================================================
+// VERIFICAR TOKEN (Middleware)
+// Se ejecuta ANTES del controlador en rutas protegidas.
+// Extrae el token del header Authorization, lo verifica y
+// agrega los datos del usuario a req para el controlador.
+// ================================================================
 export async function verificarToken(req, res, next) {
-
     console.log('Verificando token...');
 
-    // Obtiene el header Authorization
-    // El formato esperado es: "Bearer TOKEN_AQUI"
-    // Se usa replace para eliminar la palabra "Bearer " y quedarse solo con el token
+    // El token viene en el header: "Authorization: Bearer <TOKEN>"
     const token = req.header('Authorization')?.replace('Bearer ', '');
     console.log('Token recibido:', !!token);
 
-    // Si no existe token, se bloquea el acceso
     if (!token) {
         console.log('No token provided');
         return res.status(401).json({ error: 'Token requerido' });
     }
 
     try {
-        // Verifica que el token sea válido usando la misma clave secreta
-        // Si el token fue alterado o expiró, lanzará un error
-        const dataToken = jsonwebtoken.verify(token, process.env.JWT_TOKEN_SECRET);
+        // Verifica que el token sea válido (firma + expiración)
+        const dataToken = jsonwebtoken.verify(
+            token, process.env.JWT_TOKEN_SECRET
+        );
         console.log('Token verificado:', dataToken);
 
-        // Extrae el email del payload del token
         const email = dataToken.email;
 
         // Busca el usuario en la base de datos
@@ -56,20 +64,15 @@ export async function verificarToken(req, res, next) {
             return res.status(401).json({ error: 'Usuario no encontrado' });
         }
 
-        // Guarda el usuario completo en req.user
-        req.user = user;
-        // También guarda el email por compatibilidad
-        req.emailConectado = email;
+        // Guarda el usuario en req para que el controlador lo use
+        req.user = user;                // Usuario completo
+        req.emailConectado = email;     // Solo email (compatibilidad)
 
         console.log('Middleware completado, continuando...');
-        // Continúa hacia el siguiente middleware o controlador
-        next();
+        next(); // Continúa al controlador
+
     } catch (e) {
         console.log('Error en token:', e.message);
-        // Si ocurre un error (token inválido o expirado)
-        // se devuelve error 401 Unauthorized
         return res.status(401).json({ error: 'Token no válido' });
     }
-
 }
-

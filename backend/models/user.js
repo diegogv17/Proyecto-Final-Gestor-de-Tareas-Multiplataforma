@@ -1,18 +1,18 @@
-// Importamos mongoose para trabajar con ObjectId
+// ============================================================
+// Modelo de Usuario (Capa de datos)
+// ============================================================
+// Esta clase contiene los métodos que interactúan directamente
+// con MongoDB a través de Mongoose. Separa la lógica de
+// base de datos de los controladores.
+// ============================================================
 import mongoose from 'mongoose';
-
-// Importamos el modelo creado desde el schema
 import User from '../schemas/user.js';
 
-// Clase que maneja todas las operaciones de base de datos
 class userModel {
 
-    // CREAR USUARIO
+    // Crea un nuevo usuario en la base de datos
     async create(data) {
-
         try {
-            // data debe contener:
-            // email, password, name
             return await User.create({
                 email: data.email,
                 password: data.password,
@@ -20,16 +20,14 @@ class userModel {
                 createdAt: new Date(),
                 updatedAt: new Date()
             });
-
         }
         catch (error) {
             throw error;
         }
     }
 
-    // OBTENER TODOS LOS USUARIOS
+    // Obtiene todos los usuarios
     async getAll() {
-
         try {
             return await User.find();
         }
@@ -38,7 +36,7 @@ class userModel {
         }
     }
 
-    // OBTENER USUARIO POR ID
+    // Obtiene un usuario por su ID de MongoDB
     async getOneById(id) {
         try {
             return await User.findById(
@@ -50,10 +48,8 @@ class userModel {
         }
     }
 
-    // OBTENER USUARIO POR FILTRO
-    // ejemplo: email
+    // Obtiene un usuario por un filtro (ej: { email: 'correo@ejemplo.com' })
     async getOne(filtro) {
-
         try {
             return await User.findOne(filtro);
         }
@@ -62,7 +58,7 @@ class userModel {
         }
     }
 
-    // ACTUALIZAR USUARIO
+    // Actualiza los datos de un usuario por su ID
     async update(id, data) {
         try {
             return await User.findByIdAndUpdate(
@@ -73,18 +69,15 @@ class userModel {
                     password: data.password,
                     updatedAt: new Date()
                 },
-                {
-                    new: true
-                }
+                { new: true } // Devuelve el documento actualizado
             )
         }
         catch (error) {
             throw error;
         }
-
     }
 
-    // ELIMINAR USUARIO
+    // Elimina un usuario por su ID
     async delete(id) {
         try {
             return await User.findByIdAndDelete(
@@ -96,5 +89,6 @@ class userModel {
         }
     }
 }
-// Exportamos el modelo
+
+// Exporta una instancia única (patrón Singleton)
 export default new userModel();

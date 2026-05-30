@@ -1,3 +1,9 @@
+// ============================================================
+// TaskService: Servicio de tareas (CRUD contra el backend)
+// ============================================================
+// Cada método realiza una petición HTTP y transforma la respuesta
+// JSON en objetos TaskModel de Dart.
+// ============================================================
 import 'package:flutter_application_1/core/constants/api_constants.dart';
 import 'package:flutter_application_1/models/task_model.dart';
 import 'package:flutter_application_1/services/api_service.dart';
@@ -5,8 +11,9 @@ import 'package:flutter_application_1/services/api_service.dart';
 class TaskService {
   TaskService(this._api);
 
-  final ApiService _api;
+  final ApiService _api; // Cliente HTTP inyectado
 
+  // Obtener todas las tareas: GET /api/tasks
   Future<List<TaskModel>> getAll({
     String? status,
     String? priority,
@@ -30,6 +37,7 @@ class TaskService {
     );
   }
 
+  // Obtener tarea por ID: GET /api/tasks/:id
   Future<TaskModel> getById(String id) async {
     return _api.get(
       '${ApiConstants.tasksPath}/$id',
@@ -40,6 +48,7 @@ class TaskService {
     );
   }
 
+  // Crear tarea: POST /api/tasks
   Future<TaskModel> create(TaskModel task) async {
     return _api.post(
       ApiConstants.tasksPath,
@@ -51,6 +60,7 @@ class TaskService {
     );
   }
 
+  // Actualizar tarea: PUT /api/tasks/:id
   Future<TaskModel> update(TaskModel task) async {
     return _api.put(
       '${ApiConstants.tasksPath}/${task.id}',
@@ -62,6 +72,7 @@ class TaskService {
     );
   }
 
+  // Eliminar tarea: DELETE /api/tasks/:id
   Future<void> delete(String id) async {
     await _api.delete('${ApiConstants.tasksPath}/$id');
   }

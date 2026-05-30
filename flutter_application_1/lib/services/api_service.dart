@@ -2,42 +2,56 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_application_1/core/constants/api_constants.dart';
 
+// ============================================================
+// ApiException: Error personalizado para la comunicación HTTP
+// ============================================================
 class ApiException implements Exception {
   ApiException({required this.message, this.statusCode});
 
-  final String message;
-  final int? statusCode;
+  final String message;    // Mensaje descriptivo del error
+  final int? statusCode;   // Código HTTP (401, 500, etc.)
 
   @override
   String toString() => message;
 }
 
+// ============================================================
+// ApiService: Capa de comunicación HTTP con el backend
+// ============================================================
+// Utiliza Dio (cliente HTTP) para realizar peticiones GET, POST,
+// PUT y DELETE. También maneja el token JWT de forma automática
+// mediante interceptors y FlutterSecureStorage.
+// ============================================================
 class ApiService {
   ApiService({FlutterSecureStorage? secureStorage})
       : _secureStorage = secureStorage ?? const FlutterSecureStorage();
 
-  late final Dio _dio;
-  final FlutterSecureStorage _secureStorage;
+  late final Dio _dio;                     // Cliente HTTP
+  final FlutterSecureStorage _secureStorage; // Almacenamiento seguro para el token
   bool _initialized = false;
 
+  // Inicializa el cliente HTTP con la URL base y los interceptors
   Future<void> initialize() async {
     if (_initialized) return;
 
     _dio = Dio(
       BaseOptions(
-        baseUrl: ApiConstants.baseUrl,
-        connectTimeout: ApiConstants.connectionTimeout,
-        receiveTimeout: ApiConstants.receiveTimeout,
-        contentType: Headers.jsonContentType,
+        baseUrl: ApiConstants.baseUrl,              // URL del backend
+        connectTimeout: ApiConstants.connectionTimeout, // Timeout de conexión
+        receiveTimeout: ApiConstants.receiveTimeout,   // Timeout de recepción
+        contentType: Headers.jsonContentType,        // Formato JSON
         headers: {'Accept': 'application/json'},
       ),
     );
 
+    // Interceptor para agregar el token JWT automáticamente
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
+          // Lee el token almacenado en el dispositivo
           final token = await _secureStorage.read(key: StorageKeys.authToken);
           if (token != null) {
+            // Agrega el header Authorization: Bearer <token>
             options.headers['Authorization'] = 'Bearer $token';
           }
           handler.next(options);
@@ -49,6 +63,7 @@ class ApiService {
     _initialized = true;
   }
 
+  // Petición GET: obtiene datos del servidor
   Future<T> get<T>(
     String path, {
     Map<String, dynamic>? queryParameters,
@@ -62,6 +77,7 @@ class ApiService {
     }
   }
 
+  // Petición POST: envía datos al servidor (crear recursos)
   Future<T> post<T>(
     String path, {
     dynamic data,
@@ -75,6 +91,7 @@ class ApiService {
     }
   }
 
+  // Petición PUT: actualiza un recurso existente
   Future<T> put<T>(
     String path, {
     dynamic data,
@@ -88,6 +105,7 @@ class ApiService {
     }
   }
 
+  // Petición DELETE: elimina un recurso
   Future<void> delete(String path) async {
     try {
       await _dio.delete(path);
@@ -96,6 +114,7 @@ class ApiService {
     }
   }
 
+  // Manejo centralizado de errores HTTP
   ApiException _handleError(DioException error) {
     if (error.type == DioExceptionType.connectionTimeout ||
         error.type == DioExceptionType.receiveTimeout) {
@@ -136,6 +155,7 @@ class ApiService {
     return ApiException(message: error.message ?? 'Error desconocido');
   }
 
+  // GESTIÓN DEL TOKEN JWT
   Future<void> setToken(String token) async {
     await _secureStorage.write(key: StorageKeys.authToken, value: token);
   }
